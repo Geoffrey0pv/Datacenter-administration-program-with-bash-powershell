@@ -31,6 +31,9 @@ Este proyecto consiste en dos herramientas (una en Bash para Linux y otra en Pow
 PROJECTO/
 ├── bash/
 │   ├── admin_tool.sh                    # Script principal con menú
+│   ├── setup.sh                         # Script de instalación
+│   ├── test.sh                          # Script de verificación
+│   ├── DOCUMENTATION.md                 # Documentación técnica completa
 │   ├── users/
 │   │   └── users.sh                     # Módulo 1: Usuarios y último login
 │   ├── filesystems/
@@ -56,23 +59,33 @@ git clone https://github.com/Geoffrey0pv/Datacenter-administration-program-with-
 cd Datacenter-administration-program-with-bash-powershell
 ```
 
-2. **Dar permisos de ejecución:**
-```bash
-chmod +x bash/admin_tool.sh
-chmod +x bash/users/*.sh
-chmod +x bash/filesystems/*.sh
-chmod +x bash/largest_files/*.sh
-chmod +x bash/memory/*.sh
-chmod +x bash/backup/*.sh
-```
-
-3. **Ejecutar la herramienta:**
+2. **Verificar el sistema:**
 ```bash
 cd bash
+./test.sh
+```
+
+3. **Configurar permisos (automático):**
+```bash
+./setup.sh
+```
+
+O **manualmente:**
+```bash
+chmod +x admin_tool.sh setup.sh test.sh
+chmod +x users/*.sh
+chmod +x filesystems/*.sh
+chmod +x largest_files/*.sh
+chmod +x memory/*.sh
+chmod +x backup/*.sh
+```
+
+4. **Ejecutar la herramienta:**
+```bash
 sudo ./admin_tool.sh
 ```
 
-> **Nota:** Se requieren permisos de superusuario (sudo) para algunas funcionalidades.
+> **Nota:** Se requieren permisos de superusuario (sudo) para acceso completo a todas las funcionalidades.
 
 ## Funcionalidades Detalladas
 
