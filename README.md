@@ -23,7 +23,10 @@ Este proyecto consiste en dos herramientas (una en Bash para Linux y otra en Pow
 - Compatible con sistemas Linux
 
 ### Versión PowerShell (Windows)
-- (En desarrollo)
+- Script principal con menú interactivo (`admin_tools.ps1`)
+- Ejecución modular de cada funcionalidad en scripts dedicados
+- Compatibilidad con PowerShell 5.1+ y Windows 10/11
+- Soporte para unidades locales, de red y USB
 
 ## Estructura del Proyecto
 
@@ -44,8 +47,13 @@ PROJECTO/
 │   │   └── memory.sh                    # Módulo 4: Memoria y swap
 │   └── backup/
 │       └── backup.sh                    # Módulo 5: Backup a USB
-├── powershell/
-│   └── (En desarrollo)
+├── pwsh/
+│   ├── admin_tools.ps1                # Menú principal en PowerShell
+│   ├── all_disks.ps1                  # Módulo 2: Filesystems y discos
+│   ├── top_files.ps1                  # Módulo 3: Archivos más grandes
+│   ├── memory_swap.ps1                # Módulo 4: Memoria y swap
+│   ├── back_up_to.ps1                 # Módulo 5: Backup a USB con catálogo
+│   └── user_logon_registry.ps1        # Módulo 1: Usuarios y último login
 └── README.md
 ```
 
@@ -86,6 +94,37 @@ sudo ./admin_tool.sh
 ```
 
 > **Nota:** Se requieren permisos de superusuario (sudo) para acceso completo a todas las funcionalidades.
+
+### PowerShell (Windows)
+
+1. **Abrir PowerShell con permisos adecuados:**
+   - Se recomienda ejecutar como administrador para evitar restricciones de permisos.
+2. **Clonar y ubicarse en la carpeta del proyecto (si no se ha hecho ya):**
+   ```powershell
+   git clone https://github.com/Geoffrey0pv/Datacenter-administration-program-with-bash-powershell.git
+   Set-Location .\Datacenter-administration-program-with-bash-powershell\pwsh
+   ```
+3. **Permitir la ejecución temporal de scripts (solo durante la sesión actual):**
+   ```powershell
+   Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+   ```
+4. **Ejecutar el menú principal:**
+   ```powershell
+   .\admin_tools.ps1
+   ```
+
+> **Notas:**
+> - También es posible ejecutar `admin_tools.ps1` directamente con `powershell -ExecutionPolicy Bypass -File .\admin_tools.ps1`.
+> - Las opciones del menú invocan los módulos individuales ubicados en la misma carpeta.
+
+### Descripción de los Scripts PowerShell
+
+- `admin_tools.ps1`: menú interactivo que orquesta las cinco funcionalidades disponibles.
+- `user_logon_registry.ps1`: lista usuarios locales habilitados y su último inicio de sesión, utilizando `Get-LocalUser` cuando está disponible.
+- `all_disks.ps1`: muestra información detallada de los discos lógicos detectados (tipo de unidad, tamaño total, espacio libre y porcentaje).
+- `top_files.ps1`: solicita una ruta y lista los 10 archivos más grandes encontrados, manejando errores de permisos o rutas inexistentes.
+- `memory_swap.ps1`: genera un reporte del uso de memoria física y de la memoria virtual (swap/pagefile) en bytes y porcentaje.
+- `back_up_to.ps1`: guía al usuario para seleccionar una unidad USB, crea un directorio de respaldo con sello de tiempo, genera un catálogo CSV y realiza la copia (preferiblemente con Robocopy).
 
 ## Funcionalidades Detalladas
 
