@@ -1,21 +1,13 @@
 #!/bin/bash
-#==============================================================================
-# Data Center Administration Tool - Main Menu
-# Proyecto Final - Sistemas Operativos
-# Descripción: Menú principal que llama a los módulos específicos
-#==============================================================================
 
-# Directorio base donde están los módulos
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Colores para el menú
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Función para mostrar el menú
 show_menu() {
     clear
     echo -e "${BLUE}============================================================${NC}"
@@ -32,13 +24,11 @@ show_menu() {
     echo -e "${BLUE}============================================================${NC}"
 }
 
-# Función para pausar y esperar input del usuario
 pause() {
     echo ""
     read -p "Presione ENTER para continuar..."
 }
 
-# Función principal
 main() {
     while true; do
         show_menu
@@ -47,27 +37,27 @@ main() {
         case $option in
             1)
                 echo -e "\n${YELLOW}Ejecutando: Usuarios del sistema...${NC}\n"
-                bash "$SCRIPT_DIR/users/users.sh"
+                bash "$SCRIPT_DIR/users.sh"
                 pause
                 ;;
             2)
                 echo -e "\n${YELLOW}Ejecutando: Filesystems y discos...${NC}\n"
-                bash "$SCRIPT_DIR/filesystems/filesystems.sh"
+                bash "$SCRIPT_DIR/filesystems.sh"
                 pause
                 ;;
             3)
                 echo -e "\n${YELLOW}Ejecutando: Archivos más grandes...${NC}\n"
-                bash "$SCRIPT_DIR/largest_files/largest_files.sh"
+                bash "$SCRIPT_DIR/largest_files.sh"
                 pause
                 ;;
             4)
                 echo -e "\n${YELLOW}Ejecutando: Memoria y swap...${NC}\n"
-                bash "$SCRIPT_DIR/memory/memory.sh"
+                bash "$SCRIPT_DIR/memory.sh"
                 pause
                 ;;
             5)
                 echo -e "\n${YELLOW}Ejecutando: Backup a USB...${NC}\n"
-                bash "$SCRIPT_DIR/backup/backup.sh"
+                bash "$SCRIPT_DIR/backup.sh"
                 pause
                 ;;
             6)
@@ -82,5 +72,4 @@ main() {
     done
 }
 
-# Ejecutar el programa
 main

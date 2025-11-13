@@ -1,25 +1,17 @@
 #!/bin/bash
-#==============================================================================
-# Módulo: Backup a USB
-# Descripción: Hace copia de seguridad de un directorio especificado a USB
-#              Crea un catálogo con nombres de archivos y fecha de última 
-#              modificación
-#==============================================================================
 
-# Colores
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${GREEN}  BACKUP DE DIRECTORIO A USB${NC}"
 echo -e "${BLUE}============================================================${NC}"
 echo ""
 
-# Función para validar directorio
 validate_directory() {
     local dir=$1
     if [ ! -d "$dir" ]; then
@@ -33,7 +25,6 @@ validate_directory() {
     return 0
 }
 
-# Función para crear catálogo
 create_catalog() {
     local source_dir=$1
     local catalog_file=$2
@@ -46,11 +37,9 @@ create_catalog() {
     echo "======================================================================" >> "$catalog_file"
     echo "" >> "$catalog_file"
     
-    # Encontrar todos los archivos y generar el catálogo
     find "$source_dir" -type f -printf "%s|%TY-%Tm-%Td %TH:%TM:%TS|%p\n" 2>/dev/null | \
         sort -t'|' -k3 | \
         while IFS='|' read -r size datetime filepath; do
-            # Formatear la salida
             printf "%-15s | %-20s | %s\n" "$size" "$datetime" "$filepath" >> "$catalog_file"
         done
     
@@ -60,21 +49,17 @@ create_catalog() {
     echo "# Tamaño total: $(du -sb "$source_dir" 2>/dev/null | awk '{print $1}') bytes" >> "$catalog_file"
 }
 
-# Mostrar dispositivos USB disponibles
 echo -e "${YELLOW}Dispositivos de almacenamiento disponibles:${NC}"
 echo ""
 lsblk -o NAME,SIZE,TYPE,MOUNTPOINT,LABEL | grep -E "disk|part"
 echo ""
 
-# Solicitar directorio origen
 read -p "Ingrese la ruta del directorio a respaldar: " source_dir
 
-# Validar directorio origen
 if ! validate_directory "$source_dir"; then
     exit 1
 fi
 
-# Solicitar destino USB
 echo ""
 echo -e "${YELLOW}Opciones:${NC}"
 echo "  1. Especificar punto de montaje USB (ej: /media/usb, /mnt/usb)"
@@ -82,7 +67,6 @@ echo "  2. Especificar ruta completa de destino"
 echo ""
 read -p "Ingrese la ruta de destino para el backup: " dest_dir
 
-# Validar que el destino existe o crear
 if [ ! -d "$dest_dir" ]; then
     echo -e "${YELLOW}El directorio de destino no existe.${NC}"
     read -p "¿Desea crearlo? (s/n): " create_dest
@@ -110,7 +94,6 @@ fi
 backup_name="backup_$(basename "$source_dir")_$(date '+%Y%m%d_%H%M%S')"
 backup_path="$dest_dir/$backup_name"
 
-# Crear directorio de backup
 mkdir -p "$backup_path"
 
 echo ""
@@ -119,12 +102,10 @@ echo -e "${CYAN}Origen:${NC} $source_dir"
 echo -e "${CYAN}Destino:${NC} $backup_path"
 echo ""
 
-# Calcular tamaño del directorio origen
 source_size=$(du -sb "$source_dir" 2>/dev/null | awk '{print $1}')
 echo -e "${YELLOW}Tamaño a respaldar:${NC} $source_size bytes ($(du -sh "$source_dir" 2>/dev/null | awk '{print $1}'))"
 echo ""
 
-# Realizar la copia con rsync (si está disponible) o cp
 if command -v rsync &> /dev/null; then
     echo -e "${GREEN}Usando rsync para copia eficiente...${NC}"
     rsync -av --progress "$source_dir/" "$backup_path/" 2>&1 | \
@@ -136,12 +117,10 @@ else
     copy_result=$?
 fi
 
-# Verificar si la copia fue exitosa
 if [ $copy_result -eq 0 ]; then
     echo ""
     echo -e "${GREEN}✓ Copia de archivos completada exitosamente.${NC}"
     
-    # Crear catálogo
     catalog_file="$backup_path/CATALOG.txt"
     echo ""
     echo -e "${YELLOW}Generando catálogo de archivos...${NC}"
@@ -150,7 +129,6 @@ if [ $copy_result -eq 0 ]; then
     if [ -f "$catalog_file" ]; then
         echo -e "${GREEN}✓ Catálogo creado: $catalog_file${NC}"
         
-        # Mostrar resumen del catálogo
         echo ""
         echo -e "${CYAN}Resumen del catálogo:${NC}"
         total_files=$(find "$source_dir" -type f 2>/dev/null | wc -l)
@@ -158,7 +136,6 @@ if [ $copy_result -eq 0 ]; then
         echo "  - Total de archivos respaldados: $total_files"
         echo "  - Tamaño total: $total_size bytes ($(du -sh "$source_dir" 2>/dev/null | awk '{print $1}'))"
         
-        # Crear archivo de verificación MD5 (opcional)
         echo ""
         echo -e "${YELLOW}Generando checksums para verificación de integridad...${NC}"
         find "$backup_path" -type f ! -name "CATALOG.txt" ! -name "CHECKSUMS.md5" -exec md5sum {} \; > "$backup_path/CHECKSUMS.md5" 2>/dev/null
@@ -169,7 +146,6 @@ if [ $copy_result -eq 0 ]; then
         echo -e "${RED}✗ Error al crear el catálogo.${NC}"
     fi
     
-    # Resumen final
     echo ""
     echo -e "${BLUE}============================================================${NC}"
     echo -e "${GREEN}  BACKUP COMPLETADO EXITOSAMENTE${NC}"
@@ -188,7 +164,6 @@ if [ $copy_result -eq 0 ]; then
     echo "  md5sum -c CHECKSUMS.md5"
     echo ""
     
-    # Mostrar vista previa del catálogo
     echo -e "${CYAN}Vista previa del catálogo (primeras 10 líneas):${NC}"
     head -20 "$catalog_file"
     echo "  ..."
